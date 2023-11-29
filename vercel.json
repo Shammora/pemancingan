@@ -10,16 +10,8 @@
             "dest": "/public/"
         },
         {
-            "src": "/template/(.*)",
-            "dest": "/public/template/"
-        },
-        {
-            "src": "/adminlte/(.*)",
-            "dest": "/public/adminlte/"
-        },
-        {
-            "src": "/foto/(.*)",
-            "dest": "/public/foto/"
+            "src": "/assets/(.*)",
+            "dest": "/public/assets/"
         },
         {
             "src": "/(.*)",
