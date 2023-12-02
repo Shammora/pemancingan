@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Auth;
 use App\Models\User;
 use Redirect;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class LoginController extends Controller
 {
@@ -23,71 +24,72 @@ class LoginController extends Controller
     }
     public function prosesLogin(Request $request)
     {
-        if (Auth::attempt(['username'=>$request->username,'password'=>$request->password]))
-        {
-            if (Auth::User()->peran == "Admin")
-            {
-                return \Redirect::to('/admin/home');
-            }
-            elseif (Auth::User()->peran == "Pemancing")
-            {
-                return \Redirect::to('/pemancing/home');
-            }
-            else
-            {
-                return \Redirect::to('/pemancingan/home');
+        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+            if (Auth::User()->peran == "Admin") {
+                return Redirect::to('/admin/home');
+            } elseif (Auth::User()->peran == "Pemancing") {
+                return Redirect::to('/pemancing/home');
+            } else {
+                return Redirect::to('/pemancingan/home');
             }
 
-        }
-        else
-        {
-            \Session::flash('msg_login','Username Atau Password Salah!');
-            return \Redirect::to('/');
+        } else {
+            \Session::flash('msg_login', 'Username Atau Password Salah!');
+            return Redirect::to('/');
         }
     }
-    public function prosesRegister(Request $request) {
+    public function prosesRegister(Request $request)
+    {
+        try {
+            $folder = 'web_pemancingan_fahri';
 
-        $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
-        $extention = $request->file('foto')->extension();
-        $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-        $destination = base_path() .'/public/foto';
-        $request->file('foto')->move($destination,$photo);
+            $uploadedFile = $request->file('foto')->storeOnCloudinary($folder);
 
-        $user = new User;
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->username = $request->username;
-        $user->no_hp = $request->no_hp;
-        $user->foto = $photo;
-        $user->password = bcrypt($request->password);
-        $user->peran = 'Pemancing';
-        $user->save();
+            $user = new User;
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->username = $request->username;
+            $user->no_hp = $request->no_hp;
+            $user->foto = $uploadedFile->getSecurePath();
+            $user->password = bcrypt($request->password);
+            $user->peran = 'Pemancing';
+            $user->save();
 
-        \Session::flash('msg_success','Registerasi Berhasil!');
-        return Redirect::route('register');
+            \Session::flash('msg_success', 'Registrasi Berhasil!');
+            return Redirect::route('register');
+        } catch (\Exception $e) {
+            \Session::flash('msg_error', 'Something Went Wrong!');
+            return Redirect::route('register');
+        }
     }
-    public function prosesRegisterPihak(Request $request) {
-        $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
-        $extention = $request->file('foto')->extension();
-        $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-        $destination = base_path() .'/public/foto';
-        $request->file('foto')->move($destination,$photo);
+    public function prosesRegisterPihak(Request $request)
+    {
+        try {
+            $folder = 'web_pemancingan_fahri';
 
-        $user = new User;
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->username = $request->username;
-        $user->no_hp = $request->no_hp;
-        $user->foto = $photo;
-        $user->password = bcrypt($request->password);
-        $user->peran = 'Pihak Pemancingan';
-        $user->save();
+            $uploadedFile = $request->file('foto')->storeOnCloudinary($folder);
 
-        \Session::flash('msg_success','Registerasi Berhasil!');
-        return Redirect::route('register_pihak');
+            $user = new User;
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->username = $request->username;
+            $user->no_hp = $request->no_hp;
+            $user->foto = $uploadedFile->getSecurePath();
+            $user->password = bcrypt($request->password);
+            $user->peran = 'Pihak Pemancingan';
+            $user->save();
+
+            \Session::flash('msg_success', 'Registrasi Berhasil!');
+            return Redirect::route('register_pihak');
+        } catch (\Exception $e) {
+            \Session::flash('msg_error', 'Something Went Wrong!');
+            return Redirect::route('register_pihak');
+        }
     }
-    public function logout(){
+
+    public function logout()
+    {
         Auth::logout();
-      return \Redirect::to('/');
+        return Redirect::to('/');
     }
 }

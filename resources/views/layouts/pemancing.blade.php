@@ -76,7 +76,7 @@
 
     <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0 wow fadeIn" data-wow-delay="0.1s">
         <a href="{{ route('pemancing.index') }}" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <img src="{{ asset('logo.png') }}" alt="Logo" style="height: 70px">
+            <img src="{{ asset('assets/logo.png') }}" alt="Logo" style="height: 70px">
 
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -96,8 +96,8 @@
                             <span class="dropdown-toggle" style="color: #3156A5"></span>
                         </div>
                         <div class="col-sm-5" style="margin-right: 20px">
-                            <a href="#" class="nav-link" data-bs-toggle="dropdown"
-                                style="font-size: 12px">{{ strtoupper(Auth::user()->name) }}</a>
+                            <a href="#" class="nav-link" data-bs-toggle="dropdown" style="font-size: 12px">{{
+                                strtoupper(Auth::user()->name) }}</a>
                         </div>
                     </div>
                     <div class="dropdown-menu rounded-0 rounded-bottom m-0" style="border: 1px solid #3156A5">
@@ -105,7 +105,7 @@
                         <a href="{{ route('logout') }}" class="dropdown-item">Keluar</a>
                     </div>
                 </div>
-                <img src="{{ asset('foto/' . Auth::user()->foto) }}" alt="Foto Pengguna">
+                <img src="{{ Auth::user()->foto ? Auth::user()->foto : asset('foto/default.png')}}" alt="Foto Pengguna">
             </div>
 
         </div>
@@ -124,6 +124,8 @@
     <script src="{{ asset('template/lib/tempusdominus/js/moment.min.js') }}"></script>
     <script src="{{ asset('template/lib/tempusdominus/js/moment-timezone.min.js') }}"></script>
     <script src="{{ asset('template/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+
+
 
     <script src="{{ asset('template/js/main.js') }}"></script>
     @yield('javascript')
