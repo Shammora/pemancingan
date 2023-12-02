@@ -71,7 +71,8 @@
                             @foreach (@$pemancing as $key => $value)
                             <tr>
                                 <td>{{ @$value->id }}</td>
-                                <td><img class="zoom" src="{{ @$value->foto }}"></td>
+                                <td><img class="zoom"
+                                        src="{{ @$value->foto ? @$value->foto : asset('foto/default.png') }}"></td>
                                 <td>{{ @$value->name }}</td>
                                 <td>{{ @$value->email }}</td>
                                 <td>{{ @$value->username }}</td>
