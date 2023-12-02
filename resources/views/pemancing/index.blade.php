@@ -2,7 +2,7 @@
 @section('css')
     <style>
         .newBackground {
-            background-image: url('/logoMancing.jpg');
+            background-image: url('/assets/logoMancing.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
