@@ -9,10 +9,12 @@ use DB;
 use App\Models\User;
 use App\Models\Pemancingan;
 use App\Models\Jadwal;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class PemancinganController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $title = 'Home';
         return view('pemancingan.index', compact('title'));
     }
@@ -20,9 +22,10 @@ class PemancinganController extends Controller
     {
         $title = 'Profile';
         $pemancingan = User::find(Auth::user()->id);
-        return view('pemancingan.profile', compact('title','pemancingan'));
+        return view('pemancingan.profile', compact('title', 'pemancingan'));
     }
-    public function updateProfile(Request $request){
+    public function updateProfile(Request $request)
+    {
         DB::beginTransaction();
         try {
             if (empty($request->foto)) {
@@ -32,7 +35,7 @@ class PemancinganController extends Controller
                     $user->email = $request->email;
                     $user->no_hp = $request->no_hp;
                     $user->save();
-                }else {
+                } else {
                     $user = User::find($request->id);
                     $user->name = $request->name;
                     $user->email = $request->email;
@@ -40,33 +43,33 @@ class PemancinganController extends Controller
                     $user->password = bcrypt($request->password);
                     $user->save();
                 }
-            }else {
+            } else {
                 if (empty($request->password)) {
                     $user = User::find($request->id);
 
-                    \File::delete(public_path('foto/'.$user->foto));
+                    \File::delete(public_path('foto/' . $user->foto));
 
-                    $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
+                    $namafoto = "Foto" . "  " . $request->name . " " . date("Y-m-d H-i-s");
                     $extention = $request->file('foto')->extension();
                     $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() .'/public/foto';
-                    $request->file('foto')->move($destination,$photo);
+                    $destination = base_path() . '/public/foto';
+                    $request->file('foto')->move($destination, $photo);
 
                     $user->name = $request->name;
                     $user->email = $request->email;
                     $user->no_hp = $request->no_hp;
                     $user->foto = $photo;
                     $user->save();
-                }else {
+                } else {
                     $user = User::find($request->id);
 
-                    \File::delete(public_path('foto/'.$user->foto));
+                    \File::delete(public_path('foto/' . $user->foto));
 
-                    $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
+                    $namafoto = "Foto" . "  " . $request->name . " " . date("Y-m-d H-i-s");
                     $extention = $request->file('foto')->extension();
                     $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() .'/public/foto';
-                    $request->file('foto')->move($destination,$photo);
+                    $destination = base_path() . '/public/foto';
+                    $request->file('foto')->move($destination, $photo);
 
                     $user->name = $request->name;
                     $user->email = $request->email;
@@ -76,183 +79,182 @@ class PemancinganController extends Controller
                     $user->save();
                 }
             }
-             DB::commit();
-            \Session::flash('msg_success','Profile Berhasil Diubah!');
+            DB::commit();
+            \Session::flash('msg_success', 'Profile Berhasil Diubah!');
             return Redirect::route('pemancingan.profile');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('pemancingan.profile');
         }
     }
 
-    public function dataPemancingan(){
-        $pemancingan = Pemancingan::where('user_id',Auth::user()->id)->get();
+    public function dataPemancingan()
+    {
+        $pemancingan = Pemancingan::where('user_id', Auth::user()->id)->get();
         $title = 'Data Pemancingan';
-        return view('pemancingan.data_pemancingan', compact('pemancingan','title'));
+        return view('pemancingan.data_pemancingan', compact('pemancingan', 'title'));
     }
-    public function addPemancingan(Request $request) {
-         DB::beginTransaction();
-            try {
-                    $pemancingan = new Pemancingan;
-
-                    $namafoto = "Gambar"."  ".$request->name." ".date("Y-m-d H-i-s");
-                    $extention = $request->file('gambar')->extension();
-                    $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() .'/public/foto';
-                    $request->file('gambar')->move($destination,$photo);
-
-                    $pemancingan->nama = $request->nama;
-                    $pemancingan->gambar = $photo;
-                    $pemancingan->deskripsi = $request->deskripsi;
-                    $pemancingan->alamat = $request->alamat;
-                    $pemancingan->telpon = $request->telp;
-                    $pemancingan->fasilitas = $request->fasilitas;
-                    $pemancingan->umpan = $request->umpan;
-                    $pemancingan->user_id = Auth::user()->id;
-                    $pemancingan->status = 'Menunggu';
-                    $pemancingan->save();
-
-                DB::commit();
-                \Session::flash('msg_success','Pemancingan Berhasil Ditambah!');
-                return Redirect::route('pemancingan.dataPemancingan');
-
-            } catch (Exception $e) {
-                DB::rollback();
-                \Session::flash('msg_error','Somethings Wrong!');
-                return Redirect::route('pemancingan.dataPemancingan');
-            }
-    }
-    public function updatePemancingan(Request $request) {
+    public function addPemancingan(Request $request)
+    {
         DB::beginTransaction();
-            try {
-                if (empty($request->gambar)) {
-                    $pemancingan = Pemancingan::find($request->id);
-                    $pemancingan->nama = $request->nama;
-                    $pemancingan->deskripsi = $request->deskripsi;
-                    $pemancingan->alamat = $request->alamat;
-                    $pemancingan->telpon = $request->telp;
-                    $pemancingan->fasilitas = $request->fasilitas;
-                    $pemancingan->umpan = $request->umpan;
-                    $pemancingan->user_id = Auth::user()->id;
-                    $pemancingan->status = 'Menunggu';
-                    $pemancingan->save();
-                }else{
-                    $pemancingan = Pemancingan::find($request->id);
+        try {
+            $pemancingan = new Pemancingan;
 
-                    \File::delete(public_path('foto/'.$pemancingan->gambar));
+            $folder = 'web_pemancingan_fahri';
 
-                    $namafoto = "Gambar"."  ".$request->name." ".date("Y-m-d H-i-s");
-                    $extention = $request->file('gambar')->extension();
-                    $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() .'/public/foto';
-                    $request->file('gambar')->move($destination,$photo);
+            $uploadedFile = $request->file('gambar')->storeOnCloudinary($folder);
 
-                    $pemancingan->nama = $request->nama;
-                    $pemancingan->gambar = $photo;
-                    $pemancingan->deskripsi = $request->deskripsi;
-                    $pemancingan->alamat = $request->alamat;
-                    $pemancingan->telpon = $request->telp;
-                    $pemancingan->fasilitas = $request->fasilitas;
-                    $pemancingan->umpan = $request->umpan;
-                    $pemancingan->user_id = Auth::user()->id;
-                    $pemancingan->status = 'Menunggu';
-                    $pemancingan->save();
-                }
+            $pemancingan->nama = $request->nama;
+            $pemancingan->gambar = $uploadedFile->getSecurePath();
+            $pemancingan->deskripsi = $request->deskripsi;
+            $pemancingan->alamat = $request->alamat;
+            $pemancingan->telpon = $request->telp;
+            $pemancingan->fasilitas = $request->fasilitas;
+            $pemancingan->umpan = $request->umpan;
+            $pemancingan->user_id = Auth::user()->id;
+            $pemancingan->status = 'Menunggu';
+            $pemancingan->save();
 
-                DB::commit();
-                \Session::flash('msg_success','Pemancingan Berhasil Ditambah!');
-                return Redirect::route('pemancingan.dataPemancingan');
+            DB::commit();
+            \Session::flash('msg_success', 'Pemancingan Berhasil Ditambah!');
+            return Redirect::route('pemancingan.dataPemancingan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Session::flash('msg_error', 'Somethings Wrong!');
+            return Redirect::route('pemancingan.dataPemancingan');
+        }
+    }
+    public function updatePemancingan(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $pemancingan = Pemancingan::find($request->id);
 
-            } catch (Exception $e) {
-                DB::rollback();
-                \Session::flash('msg_error','Somethings Wrong!');
-                return Redirect::route('pemancingan.dataPemancingan');
+            $folder = 'web_pemancingan_fahri';
+
+            if (empty($request->gambar)) {
+                $pemancingan->nama = $request->nama;
+                $pemancingan->deskripsi = $request->deskripsi;
+                $pemancingan->alamat = $request->alamat;
+                $pemancingan->telpon = $request->telp;
+                $pemancingan->fasilitas = $request->fasilitas;
+                $pemancingan->umpan = $request->umpan;
+                $pemancingan->user_id = Auth::user()->id;
+                $pemancingan->status = 'Menunggu';
+            } else {
+                Cloudinary::destroy($pemancingan->gambar);
+
+                $uploadedFile = $request->file('gambar')->storeOnCloudinary($folder);
+
+                $pemancingan->nama = $request->nama;
+                $pemancingan->gambar = $uploadedFile->getSecurePath();
+                $pemancingan->deskripsi = $request->deskripsi;
+                $pemancingan->alamat = $request->alamat;
+                $pemancingan->telpon = $request->telp;
+                $pemancingan->fasilitas = $request->fasilitas;
+                $pemancingan->umpan = $request->umpan;
+                $pemancingan->user_id = Auth::user()->id;
+                $pemancingan->status = 'Menunggu';
             }
+
+            $pemancingan->save();
+
+            DB::commit();
+            \Session::flash('msg_success', 'Pemancingan Berhasil Diubah!');
+            return Redirect::route('pemancingan.dataPemancingan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Session::flash('msg_error', 'Somethings Wrong!');
+            return Redirect::route('pemancingan.dataPemancingan');
+        }
     }
     public function deletePemancingan($id)
     {
         DB::beginTransaction();
         try {
-            $getPemancingan = Pemancingan::where('id',$id)->first();
-            \File::delete(public_path('foto/'.$getPemancingan->gambar));
-            $pemancingan = Pemancingan::where('id',$id)->delete();
+            $getPemancingan = Pemancingan::where('id', $id)->first();
+            \File::delete(public_path('foto/' . $getPemancingan->gambar));
+            // $pemancingan = Pemancingan::where('id',$id)->delete();
             DB::commit();
-            \Session::flash('msg_success','Data Pemancingan Berhasil Dihapus!');
+            \Session::flash('msg_success', 'Data Pemancingan Berhasil Dihapus!');
             return Redirect::route('pemancingan.dataPemancingan');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('pemancingan.dataPemancingan');
         }
     }
-    public function dataJadwal(){
-        $pemancingan = Pemancingan::where('user_id',Auth::user()->id)->get();
-        $jadwal = Jadwal::where('user_id',Auth::user()->id)->get();
+    public function dataJadwal()
+    {
+        $pemancingan = Pemancingan::where('user_id', Auth::user()->id)->get();
+        $jadwal = Jadwal::where('user_id', Auth::user()->id)->get();
         $title = 'Data Pemancingan';
-        return view('pemancingan.jadwal', compact('pemancingan','title','jadwal'));
+        return view('pemancingan.jadwal', compact('pemancingan', 'title', 'jadwal'));
     }
-    public function addJadwal(Request $request) {
-         DB::beginTransaction();
+    public function addJadwal(Request $request)
+    {
+        DB::beginTransaction();
         //  return $request;
-            try {
-                    $jadwal = new Jadwal;
+        try {
+            $jadwal = new Jadwal;
 
-                    $jadwal->hari = $request->hari;
-                    $jadwal->jam = $request->jam;
-                    $jadwal->tiket = $request->tiket;
-                    $jadwal->opsional = $request->opsional;
-                    $jadwal->user_id = Auth::user()->id;
-                    $jadwal->pemancingan_id = $request->pemancinganId;
-                    $jadwal->save();
+            $jadwal->hari = $request->hari;
+            $jadwal->jam = $request->jam;
+            $jadwal->tiket = $request->tiket;
+            $jadwal->opsional = $request->opsional;
+            $jadwal->user_id = Auth::user()->id;
+            $jadwal->pemancingan_id = $request->pemancinganId;
+            $jadwal->save();
 
-                DB::commit();
-                \Session::flash('msg_success','Pemancingan Berhasil Ditambah!');
-                return Redirect::route('pemancingan.dataJadwal');
+            DB::commit();
+            \Session::flash('msg_success', 'Pemancingan Berhasil Ditambah!');
+            return Redirect::route('pemancingan.dataJadwal');
 
-            } catch (Exception $e) {
-                DB::rollback();
-                \Session::flash('msg_error','Somethings Wrong!');
-                return Redirect::route('pemancingan.dataJadwal');
-            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Session::flash('msg_error', 'Somethings Wrong!');
+            return Redirect::route('pemancingan.dataJadwal');
+        }
     }
-    public function updateJadwal(Request $request) {
-         DB::beginTransaction();
+    public function updateJadwal(Request $request)
+    {
+        DB::beginTransaction();
         //  return $request;
-            try {
-                    $jadwal = Jadwal::find($request->id);
+        try {
+            $jadwal = Jadwal::find($request->id);
 
-                    $jadwal->hari = $request->hari;
-                    $jadwal->jam = $request->jam;
-                    $jadwal->tiket = $request->tiket;
-                    $jadwal->opsional = $request->opsional;
-                    $jadwal->pemancingan_id = $request->pemancinganId;
-                    $jadwal->save();
+            $jadwal->hari = $request->hari;
+            $jadwal->jam = $request->jam;
+            $jadwal->tiket = $request->tiket;
+            $jadwal->opsional = $request->opsional;
+            $jadwal->pemancingan_id = $request->pemancinganId;
+            $jadwal->save();
 
-                DB::commit();
-                \Session::flash('msg_success','Pemancingan Berhasil Diubah!');
-                return Redirect::route('pemancingan.dataJadwal');
+            DB::commit();
+            \Session::flash('msg_success', 'Pemancingan Berhasil Diubah!');
+            return Redirect::route('pemancingan.dataJadwal');
 
-            } catch (Exception $e) {
-                DB::rollback();
-                \Session::flash('msg_error','Somethings Wrong!');
-                return Redirect::route('pemancingan.dataJadwal');
-            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Session::flash('msg_error', 'Somethings Wrong!');
+            return Redirect::route('pemancingan.dataJadwal');
+        }
     }
     public function deleteJadwal($id)
     {
         DB::beginTransaction();
         try {
-            $jadwal = Jadwal::where('id',$id)->delete();
+            $jadwal = Jadwal::where('id', $id)->delete();
             DB::commit();
-            \Session::flash('msg_success','Data Jadwal Berhasil Dihapus!');
+            \Session::flash('msg_success', 'Data Jadwal Berhasil Dihapus!');
             return Redirect::route('pemancingan.dataJadwal');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('pemancingan.dataJadwal');
         }
     }

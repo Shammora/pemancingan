@@ -96,8 +96,8 @@
                             <span class="dropdown-toggle" style="color: #3156A5"></span>
                         </div>
                         <div class="col-sm-5" style="margin-right: 20px">
-                            <a href="#" class="nav-link" data-bs-toggle="dropdown"
-                                style="font-size: 12px">{{ strtoupper(Auth::user()->name) }}</a>
+                            <a href="#" class="nav-link" data-bs-toggle="dropdown" style="font-size: 12px">{{
+                                strtoupper(Auth::user()->name) }}</a>
                         </div>
                     </div>
                     <div class="dropdown-menu rounded-0 rounded-bottom m-0" style="border: 1px solid #3156A5">
@@ -105,7 +105,7 @@
                         <a href="{{ route('logout') }}" class="dropdown-item">Keluar</a>
                     </div>
                 </div>
-                <img src="{{ asset('foto/' . Auth::user()->foto) }}" alt="Foto Pengguna">
+                <img src="{{ Auth::user()->foto ? Auth::user()->foto : asset('foto/default.png')}}" alt="Foto Pengguna">
             </div>
 
         </div>
@@ -124,6 +124,8 @@
     <script src="{{ asset('template/lib/tempusdominus/js/moment.min.js') }}"></script>
     <script src="{{ asset('template/lib/tempusdominus/js/moment-timezone.min.js') }}"></script>
     <script src="{{ asset('template/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+
+
 
     <script src="{{ asset('template/js/main.js') }}"></script>
     @yield('javascript')
