@@ -227,7 +227,7 @@
                                 @foreach ($jadwal as $value)
                                 <p class="text-dark">Hari : {{ $value->hari }}</p>
                                 <p class="text-dark">Jam : {{ $value->jam }}</p>
-                                <p class="text-dark">Tiket : {{ $value->tiket }}</p>
+                                <p class="text-dark">Tiket : Rp.{{ number_format($value->tiket, 0, ',', '.') }}</p>
                                 <p class="text-dark">Opsional : {{ $value->opsional }}</p>
                                 <hr>
                                 @endforeach
