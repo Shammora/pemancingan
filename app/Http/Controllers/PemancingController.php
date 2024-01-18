@@ -33,25 +33,37 @@ class PemancingController extends Controller
     public function search(Request $request)
     {
         $title = 'Pemancingan';
-        $data = Pemancingan::where('status', 'Disetujui')->get(); #cari dan simpan data pemancingan yang statusnya disetujui
-        if (empty($request->search)) { #cek apakah inputan kosong
-            return Redirect::route('pemancing.pemancingan'); #kalau kosong kembalikan ke halaman pemancingan
+        $data = Pemancingan::where('status', 'Disetujui')->get();
+
+        if (empty($request->search)) {
+            return Redirect::route('pemancing.pemancingan');
         }
-        #kalau inputan tidak kosong
-        $hasilData = 'Data tidak ditemukan'; #buat variable untuk menampung data
+
+        $hasilData = 'Data tidak ditemukan';
         $hasilIndex = null;
         $status = 'false';
-        for ($i = 0; $i < count($data); $i++) { #lakukan perulangan berdasarkan jumlah data pemancingan
-            if (strtolower($data[$i]['nama']) == strtolower($request->search)) { #bandingkan data nama pemancingan dengan inputan berdasarkan index array
-                #jika hasilnya true
-                $hasilData = Pemancingan::find($data[$i]['id']); #simpan data pemancingan
-                $hasilIndex = $i; #simpan data index
-                $status = 'true'; #simpan data status
+        $searchProcess = [];
+
+        for ($i = 0; $i < count($data); $i++) {
+            $searchProcess[] = [
+                'search' => $request->search,
+                'step' => $i + 1,
+                'comparison' => "Bandingkan dengan index ke " . $i . " (" . $data[$i]['nama'] . ")",
+                'found' => false,
+            ];
+
+            if (strtolower($data[$i]['nama']) == strtolower($request->search)) {
+                $hasilData = Pemancingan::find($data[$i]['id']);
+                $hasilIndex = $i;
+                $status = 'true';
+                $searchProcess[$i]['found'] = true;
+                break;
             }
         }
-        #arahkan kehalaman hasil search
-        return view('pemancing.search', compact('title', 'data', 'hasilData', 'hasilIndex', 'status'));
+
+        return view('pemancing.search', compact('title', 'data', 'hasilData', 'hasilIndex', 'status', 'searchProcess'));
     }
+
     public function profile()
     {
         $title = 'Profile';

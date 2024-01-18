@@ -96,7 +96,7 @@
                             <span class="dropdown-toggle" style="color: #3156A5"></span>
                         </div>
                         <div class="col-sm-5" style="margin-right: 20px">
-                            <a href="#" class="nav-link" data-bs-toggle="dropdown" style="font-size: 12px">{{
+                            <a href="#" class="nav-link" data-bs-toggle="dropdown-toggle" style="font-size: 12px">{{
                                 strtoupper(Auth::user()->name) }}</a>
                         </div>
                     </div>

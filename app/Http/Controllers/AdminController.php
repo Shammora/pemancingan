@@ -81,7 +81,7 @@ class AdminController extends Controller
             \Session::flash('msg_success','Profile Berhasil Diubah!');
             return Redirect::route('admin.profile');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             \Session::flash('msg_error','Somethings Wrong!');
             return Redirect::route('admin.profile');
@@ -121,7 +121,7 @@ class AdminController extends Controller
             \Session::flash('msg_success','Pemancing Berhasil Ditambah!');
             return Redirect::route('admin.dataPemancing');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             \Session::flash('msg_error','Somethings Wrong!');
             return Redirect::route('admin.dataPemancing');
@@ -176,7 +176,7 @@ class AdminController extends Controller
             \Session::flash('msg_success','Pemancing Berhasil Diubah!');
             return Redirect::route('admin.dataPemancing');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             \Session::flash('msg_error','Somethings Wrong!');
             return Redirect::route('admin.dataPemancing');
@@ -193,7 +193,7 @@ class AdminController extends Controller
             \Session::flash('msg_success','Data Pemancing Berhasil Dihapus!');
             return Redirect::route('admin.dataPemancing');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             \Session::flash('msg_error','Somethings Wrong!');
             return Redirect::route('admin.dataPemancing');
@@ -235,7 +235,7 @@ class AdminController extends Controller
             \Session::flash('msg_success','Pemilik Pemancingan Berhasil Ditambah!');
             return Redirect::route('admin.dataPemilik');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             \Session::flash('msg_error','Somethings Wrong!');
             return Redirect::route('admin.dataPemilik');
@@ -294,7 +294,7 @@ class AdminController extends Controller
             \Session::flash('msg_success','Pemilik Pemancingan Berhasil Diubah!');
             return Redirect::route('admin.dataPemilik');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             \Session::flash('msg_error','Somethings Wrong!');
             return Redirect::route('admin.dataPemilik');
@@ -311,7 +311,7 @@ class AdminController extends Controller
             \Session::flash('msg_success','Data Pemilik Pemancingan Berhasil Dihapus!');
             return Redirect::route('admin.dataPemilik');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             \Session::flash('msg_error','Somethings Wrong!');
             return Redirect::route('admin.dataPemilik');
@@ -352,7 +352,7 @@ class AdminController extends Controller
             \Session::flash('msg_success','Data Pemancingan Berhasil Dihapus!');
             return Redirect::route('admin.dataPemancingan');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             \Session::flash('msg_error','Somethings Wrong!');
             return Redirect::route('admin.dataPemancingan');
