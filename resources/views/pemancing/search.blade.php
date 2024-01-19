@@ -182,23 +182,23 @@
 
                     displayStepByStep(i + 1);
 
-                    if (i === searchProcess.length - 1) {
-                        var endTime = new Date().getTime();
-                        var processTime = endTime - startTime;
+                    // if (i === searchProcess.length - 1) {
+                    //     var endTime = new Date().getTime();
+                    //     var processTime = endTime - startTime;
 
-                        // Simpan waktu pencarian ke local storage
-                        searchTimes.push(processTime);
-                        localStorage.setItem('searchTimes', JSON.stringify(searchTimes));
+                    //     // Simpan waktu pencarian ke local storage
+                    //     searchTimes.push(processTime);
+                    //     localStorage.setItem('searchTimes', JSON.stringify(searchTimes));
 
-                        // Hitung waktu maksimal, minimal, rata2
-                        var maxTime = Math.max(...searchTimes);
-                        var minTime = Math.min(...searchTimes);
-                        var averageTime = searchTimes.reduce((acc, time) => acc + time, 0) / searchTimes.length;
-                        $('#searchProcess').append("<br>Waktu Pencarian:");
-                        $('#searchProcess').append("<br>tMax: " + maxTime / 1000 + " detik");
-                        $('#searchProcess').append("<br>tMin: " + minTime / 1000 + " detik");
-                        $('#searchProcess').append("<br>tAvg: " + averageTime.toFixed(2) / 1000 + " detik");
-                    }
+                    //     // Hitung waktu maksimal, minimal, rata2
+                    //     var maxTime = Math.max(...searchTimes);
+                    //     var minTime = Math.min(...searchTimes);
+                    //     var averageTime = searchTimes.reduce((acc, time) => acc + time, 0) / searchTimes.length;
+                    //     $('#searchProcess').append("<br>Waktu Pencarian:");
+                    //     $('#searchProcess').append("<br>tMax: " + maxTime / 1000 + " detik");
+                    //     $('#searchProcess').append("<br>tMin: " + minTime / 1000 + " detik");
+                    //     $('#searchProcess').append("<br>tAvg: " + averageTime.toFixed(2) / 1000 + " detik");
+                    // }
                 }, 500);
             }
         }
