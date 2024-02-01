@@ -128,31 +128,56 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="searchModalLabel">Proses Pencarian</h5>
+                <h5 class="modal-title" id="searchModalLabel">Tahapan Algoritma</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div id="searchProcess"></div>
-
-
-                <div id="pemancinganArray" style="margin-top: 20px;">
-                    <strong>Pemancingan Array:</strong>
+                <div class="text-center">
+                    <button class="btn btn-primary" id="expandDataLengkap">Tampilkan Data
+                        Lengkap</button>
+                </div>
+                <div id="dataLengkap" style="display: none; margin-top: 10px;">
+                    <strong>Data Lengkap:</strong>
                     <pre>
 [
 @foreach($data as $pemancingan)
     {
-        "nama": "{{ $pemancingan['nama'] }}",
-        "status": "{{ $pemancingan['status'] }}"
+        "id": "{{ $pemancingan['id'] }}",
+        "nama": "{{ $pemancingan['nama'] }}"
+        "gambar": "{{ $pemancingan['gambar'] }}"
+        "deskripsi": "{{ $pemancingan['deskripsi'] }}"
     },
 @endforeach
 ]
 </pre>
                 </div>
+                <div class="text-center">
+                    <h1 class="mx-auto">↓</h1>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary" id="expandPemancinganArray">Tampilkan Pemancingan
+                        Array</button>
+                </div>
+                <div id="pemancinganArray" style="display: none; margin-top: 10px;">
+                    <strong>Pemancingan Array:</strong>
+                    <pre>
+@foreach($data as $i => $pemancingan)
+    Data array index ke {{ $i }} = {{ $pemancingan['nama'] }}
+@endforeach
+</pre>
+                </div>
+                <div class="text-center">
+                    <h1 class="mx-auto">↓</h1>
+                </div>
+                <div>
+                    <strong>Proses Pencarian:</strong>
+                    <div id="searchProcess"></div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -161,44 +186,54 @@
 
 @section('javascript')
 <script>
-    $(document).ready(function () {
+    document.addEventListener("DOMContentLoaded", function () {
         $('#searchModal').modal('show');
+
         var startTime = new Date().getTime();
-
-        // Ambil waktu pencarian dari localstorage jika ada, jiak tidak buat array baru
-        var searchTimes = JSON.parse(localStorage.getItem('searchTimes')) || [];
-
         var searchProcess = @json($searchProcess);
+        var kataDicariDisplayed = false;
+
+        function toggleSection(sectionId) {
+            var section = document.getElementById(sectionId);
+            if (section.style.display === "none" || section.style.display === "") {
+                section.style.display = "block";
+            } else {
+                section.style.display = "none";
+            }
+        }
+
+        document.getElementById('expandDataLengkap').addEventListener('click', function () {
+            toggleSection('dataLengkap');
+        });
+
+        document.getElementById('expandPemancinganArray').addEventListener('click', function () {
+            toggleSection('pemancinganArray');
+        });
 
         function displayStepByStep(i) {
             if (i < searchProcess.length) {
                 setTimeout(function () {
                     var stepInfo = searchProcess[i];
                     var stepText =
-                        "Tahap ke " + stepInfo.step + ": " + stepInfo.comparison +
-                        (stepInfo.found ? " - Sesuai." : " - Tidak sesuai.");
+                        "<br />Tahap ke " + stepInfo.step + ": <br />" + stepInfo.comparison +
+                        (stepInfo.found ? "<br />(<span class='text-success'>Sesuai</span>)" : "<br />(<span class='text-danger'>Tidak Sesuai</span>)");
+
+                    if (!kataDicariDisplayed) {
+                        $('#searchProcess').append("Kata yang dicari: <span class='text-primary'>" + stepInfo.search + "</span><br />");
+                        kataDicariDisplayed = true;
+                    }
 
                     $('#searchProcess').append(stepText + "<br>");
 
                     displayStepByStep(i + 1);
 
-                    // if (i === searchProcess.length - 1) {
-                    //     var endTime = new Date().getTime();
-                    //     var processTime = endTime - startTime;
+                    if (i === searchProcess.length - 1) {
+                        var endTime = new Date().getTime();
+                        var processTime = endTime - startTime;
 
-                    //     // Simpan waktu pencarian ke local storage
-                    //     searchTimes.push(processTime);
-                    //     localStorage.setItem('searchTimes', JSON.stringify(searchTimes));
-
-                    //     // Hitung waktu maksimal, minimal, rata2
-                    //     var maxTime = Math.max(...searchTimes);
-                    //     var minTime = Math.min(...searchTimes);
-                    //     var averageTime = searchTimes.reduce((acc, time) => acc + time, 0) / searchTimes.length;
-                    //     $('#searchProcess').append("<br>Waktu Pencarian:");
-                    //     $('#searchProcess').append("<br>tMax: " + maxTime / 1000 + " detik");
-                    //     $('#searchProcess').append("<br>tMin: " + minTime / 1000 + " detik");
-                    //     $('#searchProcess').append("<br>tAvg: " + averageTime.toFixed(2) / 1000 + " detik");
-                    // }
+                        // Hitung waktu maksimal, minimal, rata2
+                        $('#searchProcess').append("<br>Waktu Pencarian: " + processTime / 1000 + " detik");
+                    }
                 }, 500);
             }
         }
