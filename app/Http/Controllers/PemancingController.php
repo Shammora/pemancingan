@@ -35,7 +35,7 @@ class PemancingController extends Controller
         $title = 'Pemancingan';
 
         // Import data pemancingan berbentuk JSON
-        $dataMentah = file_get_contents(__DIR__ . './dataPemancingan.json');
+        $dataMentah = file_get_contents(__DIR__ . '/dataPemancingan.json');
 
         // Ubah data pemancingan menjadi array
         $data = json_decode($dataMentah, true);
