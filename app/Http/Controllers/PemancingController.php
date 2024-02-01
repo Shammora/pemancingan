@@ -33,101 +33,12 @@ class PemancingController extends Controller
     public function search(Request $request)
     {
         $title = 'Pemancingan';
-        //$data = Pemancingan::where('status', 'Disetujui')->get(); <- Metode lama mengambil data dari db
 
-        // Array yang digunakan untuk pencarian menggunakan sequential search
-        $data = [
-            [
-                "id" => "2",
-                "nama" => "Telaga Tongyang",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1702034871/web_pemancingan_fahri/x9zbkbon0nyylzzh0msw.jpg",
-                "deskripsi" => "Pemancingan Galatama Ikan Mas"
-            ],
-            [
-                "id" => "3",
-                "nama" => "Telaga Ngongkon",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1702987696/web_pemancingan_fahri/c7on57o98cgcgwo7coki.jpg",
-                "deskripsi" => "Pemancingan Galatama Ikan Lele"
-            ],
-            [
-                "id" => "4",
-                "nama" => "Galatama Bawal Pelangi",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1704894547/web_pemancingan_fahri/lq0ozzd18slqsnjldtbo.jpg",
-                "deskripsi" => "Pemancingan Galatama Ikan Bawal"
-            ],
-            [
-                "id" => "5",
-                "nama" => "Pemancingan Kylexdosel",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1705412282/web_pemancingan_fahri/tzjjhppey4xkjgsa2eva.jpg",
-                "deskripsi" => "Pemancingan Galatama Ikan Mas"
-            ],
-            [
-                "id" => "7",
-                "nama" => "Pemancingan Damai Indah",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706076771/web_pemancingan_fahri/bwjlsoq6kgp0ob84ewte.jpg",
-                "deskripsi" => "Pemancingan Galatama Ikan Mas"
-            ],
-            [
-                "id" => "9",
-                "nama" => "Pemancingan Komandan Galapung",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706698416/web_pemancingan_fahri/vietlg7z2gi3eqdn7kwr.jpg",
-                "deskripsi" => "Pemancingan Galapung Ikan Mas"
-            ],
-            [
-                "id" => "10",
-                "nama" => "Pemancingan Lingga",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706699332/web_pemancingan_fahri/jiptazyx9b6v7kvg017y.jpg",
-                "deskripsi" => "Pemancingan Galapung Ikan Mas"
-            ],
-            [
-                "id" => "11",
-                "nama" => "Pemancingan Jarwo",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706699723/web_pemancingan_fahri/l46ipepnd7p0y1tw4jlt.jpg",
-                "deskripsi" => "Pemancingan Galapung Ikan Mas"
-            ],
-            [
-                "id" => "12",
-                "nama" => "Telaga Ebysora",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706700048/web_pemancingan_fahri/pfs8zo6josdgqr6wpwdh.jpg",
-                "deskripsi" => "Pemancingan Galatama Lele"
-            ],
-            [
-                "id" => "13",
-                "nama" => "Pemancingan Kong Iman",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706700773/web_pemancingan_fahri/rdutrwidmyt26ycrj0tz.jpg",
-                "deskripsi" => "Pemancingan Galapung Ikan Mas"
-            ],
-            [
-                "id" => "15",
-                "nama" => "Telaga Aster",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706702176/web_pemancingan_fahri/nhpnnmdsyeqr34ubf5xw.jpg",
-                "deskripsi" => "Pemancingan Galatama Ikan Mas"
-            ],
-            [
-                "id" => "16",
-                "nama" => "Pemancingan Saruni Fishing",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706704334/web_pemancingan_fahri/isun9zpbezens1d3whxc.jpg",
-                "deskripsi" => "Pemancingan Galapung Ikan Mas"
-            ],
-            [
-                "id" => "17",
-                "nama" => "Pemancingan H.Yonli",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706704624/web_pemancingan_fahri/gz4sonwxzemslxq4f0ow.jpg",
-                "deskripsi" => "Pemancingan Galapung Ikan Mas"
-            ],
-            [
-                "id" => "18",
-                "nama" => "Pemancingan Bima Fishing",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706704912/web_pemancingan_fahri/flqnbhgnrdrkydlhcybz.jpg",
-                "deskripsi" => "Pemancingan Galapung Ikan Bawal"
-            ],
-            [
-                "id" => "19",
-                "nama" => "Pemancingan Teras Biru",
-                "gambar" => "https://res.cloudinary.com/zul-spk-api/image/upload/v1706705508/web_pemancingan_fahri/pth7w9rjxr8v6dmws9oh.jpg",
-                "deskripsi" => "Pemancingan Galapung Ikan Mas"
-            ],
-        ];
+        // Import data pemancingan berbentuk JSON
+        $dataMentah = file_get_contents(__DIR__ . './dataPemancingan.json');
+
+        // Ubah data pemancingan menjadi array
+        $data = json_decode($dataMentah, true);
 
         // Jika data yang dicari tidak ditemukan, kembali ke halaman pemancingan
         if (empty($request->search)) {

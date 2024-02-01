@@ -139,14 +139,19 @@
                         Lengkap</button>
                 </div>
                 <div id="dataLengkap" style="display: none; margin-top: 10px;">
-                    <strong>Data Lengkap:</strong>
-                    <pre>
+                    <div class="d-flex justify-content-between">
+                        <strong>Data Lengkap:</strong>
+                        <button class="btn btn-primary" id="copyDataLengkap">
+                            <i class="fas fa-copy"></i> Salin Data
+                        </button>
+                    </div>
+                    <pre id="dataSebenarnya:v">
 [
 @foreach($data as $pemancingan)
     {
         "id": "{{ $pemancingan['id'] }}",
-        "nama": "{{ $pemancingan['nama'] }}"
-        "gambar": "{{ $pemancingan['gambar'] }}"
+        "nama": "{{ $pemancingan['nama'] }}",
+        "gambar": "{{ $pemancingan['gambar'] }}",
         "deskripsi": "{{ $pemancingan['deskripsi'] }}"
     },
 @endforeach
@@ -240,6 +245,16 @@
 
         // Menampilkan proses pencarian
         displayStepByStep(0);
+    });
+
+    document.getElementById('copyDataLengkap').addEventListener('click', function () {
+        var dataLengkapText = document.getElementById('dataSebenarnya:v').innerText;
+
+        navigator.clipboard.writeText(dataLengkapText).then(function () {
+            alert('Data berhasil disalin!');
+        }).catch(function (err) {
+            console.error('Data gagal disalin!', err);
+        });
     });
 
     $('#searchForm').on('keyup keypress', function (e) {
