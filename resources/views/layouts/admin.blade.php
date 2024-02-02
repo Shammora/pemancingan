@@ -15,6 +15,12 @@
     @yield('css')
 </head>
 
+<style>
+    .umpetin {
+        display: none;
+    }
+</style>
+
 <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
 
@@ -62,6 +68,11 @@
                             <i class="fa fa-sign-out"></i> <span>Logout</span>
                         </a>
                     </li>
+                    <li class="umpetin">
+                        <a href="#" id="showDataModal">
+                            <i class="fa fa-copy"></i> <span>Apa nich</span>
+                        </a>
+                    </li>
                 </ul>
             </section>
         </aside>
@@ -69,9 +80,47 @@
             @yield('content')
         </div>
 
+        <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="dataModalLabel">Waduch Apa Nich</h3>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <button class="btn btn-primary" id="copyDataLengkap">
+                                <i class="fa fa-copy"></i> Salin Data
+                            </button>
+                            <button class="btn btn-primary" id="showData">
+                                <i></i> Tampilkan Data
+                            </button>
+                        </div>
+                        <div id="dataMentah" class="mt-4" style="display: none; margin-top: 10px;">
+                            <pre>
+[
+@foreach($pemancingan as $key => $value)
+    {
+        "id": "{{ $value->id }}",
+        "nama": "{{ $value->nama }}",
+        "gambar": "{{$value->gambar }}",
+        "deskripsi": "{{ $value->deskripsi }}"
+    },
+@endforeach
+]
+    </pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <footer class="main-footer">
             <div class="pull-right hidden-xs">
-                <b>Build with <span class="fa fa-coffee"></span> And <span class="fa fa-heart"></b>
+                <b>Build with <span class="fa fa-coffee"></span> And <span id="heartIcon" class="fa fa-heart"></b>
             </div>
             <strong>Copyright &copy; 2023 .</strong>
         </footer>
@@ -81,6 +130,40 @@
     <script src="{{ asset('adminlte/plugins/jQueryUI/jquery-ui.min.js') }}"></script>
     <script>
         $.widget.bridge('uibutton', $.ui.button);
+
+        function toggleSection(sectionId) {
+            var section = document.getElementById(sectionId);
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        $(document).ready(function () {
+            $('#heartIcon').on('click', function () {
+                $('.umpetin').toggle();
+            });
+
+            $('#showDataModal').on('click', function () {
+                $('#dataModal').modal('show');
+            });
+
+            document.getElementById('showData').addEventListener('click', function () {
+                toggleSection('dataMentah');
+            });
+        });
+
+        document.getElementById('copyDataLengkap').addEventListener('click', function () {
+            var dataLengkapText = document.getElementById('dataMentah').innerText;
+
+            navigator.clipboard.writeText(dataLengkapText).then(function () {
+                alert('Data berhasil disalin!');
+            }).catch(function (err) {
+                console.error('Data gagal disalin!', err);
+            });
+        });
+
     </script>
     <script src="{{ asset('adminlte/bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('adminlte/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>

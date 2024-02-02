@@ -67,7 +67,7 @@
         margin-bottom: 50px;
     }
 
-    .search {
+    .cari {
         width: 80%;
         margin-top: 30px;
         margin-left: 10%;
@@ -147,13 +147,13 @@
                     </div>
                     <pre id="dataSebenarnya:v">
 [
-@foreach($data as $pemancingan)
-    {
-        "id": "{{ $pemancingan['id'] }}",
-        "nama": "{{ $pemancingan['nama'] }}",
-        "gambar": "{{ $pemancingan['gambar'] }}",
-        "deskripsi": "{{ $pemancingan['deskripsi'] }}"
-    },
+@foreach($dataLengkap as $pemancingan)
+    [
+        "id" => "{{ $pemancingan['id'] }}",
+        "nama" => "{{ $pemancingan['nama'] }}",
+        "gambar" => "{{ $pemancingan['gambar'] }}",
+        "deskripsi" => "{{ $pemancingan['deskripsi'] }}"
+    ],
 @endforeach
 ]
 </pre>
@@ -168,7 +168,8 @@
                 <div id="pemancinganArray" style="display: none; margin-top: 10px;">
                     <strong>Pemancingan Array:</strong>
                     <pre>
-@foreach($data as $i => $pemancingan)
+{{ json_encode($pemancinganArray, JSON_PRETTY_PRINT) }}
+@foreach($dataLengkap as $i => $pemancingan)
     Data array index ke {{ $i }} = {{ $pemancingan['nama'] }}
 @endforeach
 </pre>
@@ -194,8 +195,8 @@
     document.addEventListener("DOMContentLoaded", function () {
         $('#searchModal').modal('show');
 
-        var startTime = new Date().getTime();
-        var searchProcess = @json($searchProcess);
+        var startTime = new Date().getTime(); // Waktu mulai
+        var searchProcess = @json($prosesPencarian);
         var kataDicariDisplayed = false;
 
         function toggleSection(sectionId) {
@@ -220,11 +221,11 @@
                 setTimeout(function () {
                     var stepInfo = searchProcess[i];
                     var stepText =
-                        "<br />Tahap ke " + stepInfo.step + ": <br />" + stepInfo.comparison +
-                        (stepInfo.found ? "<br />(<span class='text-success'>Sesuai</span>)" : "<br />(<span class='text-danger'>Tidak Sesuai</span>)");
+                        "<br />Tahap ke " + stepInfo.tahap + ": <br />" + stepInfo.perbandingan +
+                        (stepInfo.ditemukan ? "<br />(<span class='text-success'>Sesuai</span>)" : "<br />(<span class='text-danger'>Tidak Sesuai</span>)");
 
                     if (!kataDicariDisplayed) {
-                        $('#searchProcess').append("Kata yang dicari: <span class='text-primary'>" + stepInfo.search + "</span><br />");
+                        $('#searchProcess').append("Kata yang dicari: <span class='text-primary'>" + stepInfo.cari + "</span><br />");
                         kataDicariDisplayed = true;
                     }
 
@@ -232,11 +233,11 @@
 
                     displayStepByStep(i + 1);
 
+                    // Hitung waktu proses menjalankan sequential search
                     if (i === searchProcess.length - 1) {
-                        var endTime = new Date().getTime();
-                        var processTime = endTime - startTime;
+                        var endTime = new Date().getTime(); // Waktu selesai
+                        var processTime = endTime - startTime; // Hitung waktu = waktu selesai dikurang waktu mulai
 
-                        // Hitung waktu maksimal, minimal, rata2
                         $('#searchProcess').append("<br>Waktu Pencarian: " + processTime / 1000 + " detik");
                     }
                 }, 500);
@@ -258,7 +259,7 @@
     });
 
     $('#searchForm').on('keyup keypress', function (e) {
-        var keyCode = e.keyCode || e.which;
+        var keyCode = e.keyCode;
         if (keyCode === 13) {
             e.prt();
             return false;
