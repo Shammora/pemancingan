@@ -99,14 +99,19 @@
                         <div id="dataMentah" class="mt-4" style="display: none; margin-top: 10px;">
                             <pre>
 [
+@isset($pemancingan)
 @foreach($pemancingan as $key => $value)
-    {
-        "id": "{{ $value->id }}",
-        "nama": "{{ $value->nama }}",
-        "gambar": "{{$value->gambar }}",
-        "deskripsi": "{{ $value->deskripsi }}"
-    },
+{
+    "id": "{{ $value->id }}",
+    "nama": "{{ $value->nama }}",
+    "gambar": "{{$value->gambar }}",
+    "deskripsi": "{{ $value->deskripsi }}"
+},
 @endforeach
+@php
+    $pemancinganCount = count($pemancingan);
+    @endphp
+@endisset
 ]
     </pre>
                         </div>
@@ -140,9 +145,15 @@
             }
         }
 
+        // Bug fix, pastikan $pemancingan ada
+        var pemancinganCount = {{ $pemancinganCount ?? 0 }}
+
         $(document).ready(function () {
             $('#heartIcon').on('click', function () {
-                $('.umpetin').toggle();
+                if (pemancinganCount > 0) {
+                    console.log(pemancinganCount);
+                    $('.umpetin').toggle();
+                }
             });
 
             $('#showDataModal').on('click', function () {
