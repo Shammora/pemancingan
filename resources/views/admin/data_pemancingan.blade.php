@@ -58,6 +58,7 @@
                                 <th>Nama</th>
                                 <th>Deskripsi</th>
                                 <th>Alamat</th>
+                                <th>Link Map</th>
                                 <th>No Telpon</th>
                                 <th>Fasilitas</th>
                                 <th>Umpan</th>
@@ -74,6 +75,7 @@
                                 <td>{{ @$value->nama }}</td>
                                 <td>{{ @$value->deskripsi }}</td>
                                 <td>{{ @$value->alamat }}</td>
+                                <td>{{ @$value->link_map }}</td>
                                 <td>{{ @$value->telpon }}</td>
                                 <td>{{ @$value->fasilitas }}</td>
                                 <td>{{ @$value->umpan }}</td>

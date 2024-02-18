@@ -203,6 +203,19 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-4">
+                                <p class="text-dark"><b>Link Map</b></p>
+                            </div>
+                            <div class="col-sm-8">
+                                @if(isset($detail->link_map))
+                                <p class="text-dark">: {{ $detail->link_map }} or <a href="{{ $detail->link_map }}">Klik
+                                        me</a></p>
+                                @else
+                                <p class="text-dark">: Belum ada link</a></p>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
                                 <p class="text-dark"><b>Telepon</b></p>
                             </div>
                             <div class="col-sm-8">

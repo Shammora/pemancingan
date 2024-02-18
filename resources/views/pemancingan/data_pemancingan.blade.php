@@ -63,6 +63,7 @@
                                 <th>Nama</th>
                                 <th>Deskripsi</th>
                                 <th>Alamat</th>
+                                <th>Link Map</th>
                                 <th>Telpon</th>
                                 <th>Fasilitas</th>
                                 <th>Umpan</th>
@@ -79,6 +80,7 @@
                                 <td>{{ @$value->nama }}</td>
                                 <td>{{ @$value->deskripsi }}</td>
                                 <td>{{ @$value->alamat }}</td>
+                                <td>{{ @$value->link_map }}</td>
                                 <td>{{ @$value->telpon }}</td>
                                 <td>{{ @$value->fasilitas }}</td>
                                 <td>{{ @$value->umpan }}</td>
@@ -123,6 +125,10 @@
                     <div class="form-group has-feedback">
                         <label>Alamat :</label>
                         <textarea name="alamat" id="alamat" class="form-control" cols="4" rows="2" required></textarea>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label>Link Map :</label>
+                        <textarea name="link" id="link" class="form-control" cols="4" rows="2" required></textarea>
                     </div>
                     <div class="form-group has-feedback">
                         <label>Telpon :</label>
@@ -180,6 +186,10 @@
                         <textarea name="alamat" id="alamat" class="form-control" cols="4" rows="2" required></textarea>
                     </div>
                     <div class="form-group has-feedback">
+                        <label>Link Map :</label>
+                        <textarea name="link" id="link" class="form-control" cols="4" rows="2" required></textarea>
+                    </div>
+                    <div class="form-group has-feedback">
                         <label>Telpon :</label>
                         <input type="number" name="telp" class="form-control" placeholder="No Telpon" required>
                     </div>
@@ -223,9 +233,10 @@
         $('input[name=nama]').val(row[2]);
         $('textarea[name=deskripsi]').val(row[3]);
         $('textarea[name=alamat]').val(row[4])
-        $('input[name=telp]').val(row[5])
-        $('input[name=fasilitas]').val(row[6])
-        $('input[name=umpan]').val(row[7])
+        $('textarea[name=link]').val(row[5])
+        $('input[name=telp]').val(row[6])
+        $('input[name=fasilitas]').val(row[7])
+        $('input[name=umpan]').val(row[8])
         $('#modal-form-edit-pemancing').modal('show');
     });
     $('#modal-form-tambah-pemancing').on('show.bs.modal', function () {
@@ -233,6 +244,7 @@
         $('input[name=nama]').val('');
         $('textarea[name=deskripsi]').val('');
         $('textarea[name=alamat]').val('');
+        $('textarea[name=link]').val('');
         $('input[name=telp]').val('');
         $('input[name=umpan]').val('');
         $('input[name=fasilitas]').val('');

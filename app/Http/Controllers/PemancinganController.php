@@ -110,6 +110,7 @@ class PemancinganController extends Controller
             $pemancingan->gambar = $uploadedFile->getSecurePath();
             $pemancingan->deskripsi = $request->deskripsi;
             $pemancingan->alamat = $request->alamat;
+            $pemancingan->link_map = $request->link;
             $pemancingan->telpon = $request->telp;
             $pemancingan->fasilitas = $request->fasilitas;
             $pemancingan->umpan = $request->umpan;
@@ -138,6 +139,7 @@ class PemancinganController extends Controller
                 $pemancingan->nama = $request->nama;
                 $pemancingan->deskripsi = $request->deskripsi;
                 $pemancingan->alamat = $request->alamat;
+                $pemancingan->link_map = $request->link;
                 $pemancingan->telpon = $request->telp;
                 $pemancingan->fasilitas = $request->fasilitas;
                 $pemancingan->umpan = $request->umpan;
@@ -152,6 +154,7 @@ class PemancinganController extends Controller
                 $pemancingan->gambar = $uploadedFile->getSecurePath();
                 $pemancingan->deskripsi = $request->deskripsi;
                 $pemancingan->alamat = $request->alamat;
+                $pemancingan->link_map = $request->link;
                 $pemancingan->telpon = $request->telp;
                 $pemancingan->fasilitas = $request->fasilitas;
                 $pemancingan->umpan = $request->umpan;
