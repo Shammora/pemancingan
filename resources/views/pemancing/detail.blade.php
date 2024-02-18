@@ -203,12 +203,11 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-4">
-                                <p class="text-dark"><b>Link Map</b></p>
+                                <p class="text-dark"><b>Google Map</b></p>
                             </div>
                             <div class="col-sm-8">
                                 @if(isset($detail->link_map))
-                                <p class="text-dark">: {{ $detail->link_map }} or <a href="{{ $detail->link_map }}">Klik
-                                        me</a></p>
+                                {!! $detail->link_map !!}
                                 @else
                                 <p class="text-dark">: Belum ada link</a></p>
                                 @endif

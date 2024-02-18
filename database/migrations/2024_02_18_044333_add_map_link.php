@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('pemancingan', function (Blueprint $table) {
-            $table->string("link_map")->nullable();
+            $table->string("link_map", 2000)->nullable();
         });
     }
 
