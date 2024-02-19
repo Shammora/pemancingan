@@ -8,177 +8,140 @@ use Auth;
 use DB;
 use App\Models\User;
 use App\Models\Pemancingan;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+
 
 class AdminController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $title = 'Home';
-        $pemancingan = Pemancingan::where('status','Disetujui')->orWhere('status','Menunggu')->get();
-        $pemancing = User::where('peran','Pemancing')->get();
-        return view('admin.index', compact('title','pemancingan','pemancing'));
+        $pemancingan = Pemancingan::where('status', 'Disetujui')->orWhere('status', 'Menunggu')->get();
+        $pemancing = User::where('peran', 'Pemancing')->get();
+        return view('admin.index', compact('title', 'pemancingan', 'pemancing'));
     }
     public function profile()
     {
         $title = 'Profile';
         $admin = User::find(Auth::user()->id);
-        return view('admin.profile', compact('title','admin'));
+        return view('admin.profile', compact('title', 'admin'));
     }
-    public function updateProfile(Request $request){
+    public function updateProfile(Request $request)
+    {
         DB::beginTransaction();
+
         try {
-            if (empty($request->foto)) {
-                if (empty($request->password)) {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->save();
-                }else {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->password = bcrypt($request->password);
-                    $user->save();
+            $user = User::find($request->id);
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->no_hp = $request->no_hp;
+
+            if ($request->hasFile('foto')) {
+                if ($user->foto) {
+                    $publicId = Cloudinary::privateResource($user->foto)->getPublicId();
+                    Cloudinary::destroy($publicId);
                 }
-            }else {
-                if (empty($request->password)) {
-                    $user = User::find($request->id);
 
-                    \File::delete(public_path('foto/'.$user->foto));
+                $folder = 'web_pemancingan_fahri';
 
-                    $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
-                    $extention = $request->file('foto')->extension();
-                    $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() .'/public/foto';
-                    $request->file('foto')->move($destination,$photo);
+                $uploadedFile = $request->file('foto')->storeOnCloudinary($folder);
 
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->foto = $photo;
-                    $user->save();
-                }else {
-                    $user = User::find($request->id);
-
-                    \File::delete(public_path('foto/'.$user->foto));
-
-                    $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
-                    $extention = $request->file('foto')->extension();
-                    $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() .'/public/foto';
-                    $request->file('foto')->move($destination,$photo);
-
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->foto = $photo;
-                    $user->password = bcrypt($request->password);
-                    $user->save();
-                }
+                $user->foto = $uploadedFile->getSecurePath();
             }
-             DB::commit();
-            \Session::flash('msg_success','Profile Berhasil Diubah!');
-            return Redirect::route('admin.profile');
 
+            if (!empty($request->password)) {
+                $user->password = bcrypt($request->password);
+            }
+
+            $user->save();
+
+            DB::commit();
+
+            \Session::flash('msg_success', 'Profile Berhasil Diubah!');
+            return Redirect::route('admin.profile');
         } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+
+            // Buat error log
+            \Log::error('Exception caught: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('admin.profile');
         }
     }
-    public function dataPemancing(){
-        $pemancing = User::where('peran','Pemancing')->get();
+    public function dataPemancing()
+    {
+        $pemancing = User::where('peran', 'Pemancing')->get();
         $title = 'Data Pemancing';
-        return view('admin.data_pemancing', compact('pemancing','title'));
+        return view('admin.data_pemancing', compact('pemancing', 'title'));
     }
-    public function addPemancing(Request $request){
+    public function addPemancing(Request $request)
+    {
         DB::beginTransaction();
         try {
-            $cekUsername = User::where('username',$request->username)->first();
-            if (!empty($cekUsername)) {
-                \Session::flash('msg_error','Username Sudah Digunakan!');
-                return Redirect::route('admin.dataPemancing');
-            }
+            $folder = 'web_pemancingan_fahri';
 
-            $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
-            $extention = $request->file('foto')->extension();
-            $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-            $destination = base_path() .'/public/foto';
-            $request->file('foto')->move($destination,$photo);
+            $uploadedFile = $request->file('foto')->storeOnCloudinary($folder);
 
             $user = new User;
             $user->name = $request->name;
             $user->email = $request->email;
             $user->username = $request->username;
-            $user->foto = $photo;
-            $user->peran = 'Pemancing';
-            $user->password = bcrypt($request->password);
             $user->no_hp = $request->no_hp;
+            $user->foto = $uploadedFile->getSecurePath();
+            $user->password = bcrypt($request->password);
+            $user->peran = 'Pemancing';
             $user->save();
 
-            DB::commit();
-            \Session::flash('msg_success','Pemancing Berhasil Ditambah!');
+            \Session::flash('msg_success', 'Data Pemancing Berhasil Ditambah!');
             return Redirect::route('admin.dataPemancing');
-
         } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('admin.dataPemancing');
         }
     }
-    public function updatePemancing(Request $request){
+    public function updatePemancing(Request $request)
+    {
         DB::beginTransaction();
         try {
-            if (empty($request->foto)) {
-                if (empty($request->password)) {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->save();
-                }else {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->password = bcrypt($request->password);
-                    $user->no_hp = $request->no_hp;
-                    $user->save();
+            $user = User::find($request->id);
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->no_hp = $request->no_hp;
+
+            if ($request->hasFile('foto')) {
+                if ($user->foto) {
+                    $publicId = Cloudinary::privateResource($user->foto)->getPublicId();
+                    Cloudinary::destroy($publicId);
                 }
-            }else {
-                if (empty($request->password)) {
-                    $user = User::find($request->id);
 
-                    \File::delete(public_path('foto/'.$user->foto));
+                $folder = 'web_pemancingan_fahri';
 
-                    $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
-                    $extention = $request->file('foto')->extension();
-                    $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() .'/public/foto';
-                    $request->file('foto')->move($destination,$photo);
+                $uploadedFile = $request->file('foto')->storeOnCloudinary($folder);
 
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->foto = $photo;
-                    $user->no_hp = $request->no_hp;
-                    $user->save();
-                }else {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->foto = $photo;
-                    $user->password = bcrypt($request->password);
-                    $user->no_hp = $request->no_hp;
-                    $user->save();
-                }
+                $user->foto = $uploadedFile->getSecurePath();
             }
-             DB::commit();
-            \Session::flash('msg_success','Pemancing Berhasil Diubah!');
-            return Redirect::route('admin.dataPemancing');
 
+            if (!empty($request->password)) {
+                $user->password = bcrypt($request->password);
+            }
+
+            $user->save();
+
+            DB::commit();
+
+            \Session::flash('msg_success', 'Data Pemancing Berhasil Diubah!');
+            return Redirect::route('admin.dataPemancing');
         } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('admin.dataPemancing');
         }
     }
@@ -186,117 +149,96 @@ class AdminController extends Controller
     {
         DB::beginTransaction();
         try {
-            $getUser = User::where('id',$id)->first();
-            \File::delete(public_path('foto/'.$getUser->foto));
-            $user = User::where('id',$id)->delete();
+            $getUser = User::where('id', $id)->first();
+            Cloudinary::destroy($getUser->foto);
+            User::where('id', $id)->delete();
             DB::commit();
-            \Session::flash('msg_success','Data Pemancing Berhasil Dihapus!');
+            \Session::flash('msg_success', 'Data Pemancing Berhasil Dihapus!');
             return Redirect::route('admin.dataPemancing');
 
         } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('admin.dataPemancing');
         }
     }
 
-    public function dataPemilik(){
-        $pemilik = User::where('peran','Pihak Pemancingan')->get();
+    public function dataPemilik()
+    {
+        $pemilik = User::where('peran', 'Pihak Pemancingan')->get();
         $title = 'Data Pemilik Pemancingan';
-        return view('admin.data_pemilik', compact('pemilik','title'));
+        return view('admin.data_pemilik', compact('pemilik', 'title'));
     }
-    public function addPemilik(Request $request){
+    public function addPemilik(Request $request)
+    {
         DB::beginTransaction();
         try {
-            $cekUsername = User::where('username',$request->username)->first();
+            $cekUsername = User::where('username', $request->username)->first();
             if (!empty($cekUsername)) {
-                \Session::flash('msg_error','Username Sudah Digunakan!');
+                \Session::flash('msg_error', 'Username Sudah Digunakan!');
                 return Redirect::route('admin.dataPemilik');
             }
 
-            $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
-            $extention = $request->file('foto')->extension();
-            $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-            $destination = base_path() .'/public/foto';
-            $request->file('foto')->move($destination,$photo);
+            $folder = 'web_pemancingan_fahri';
+
+            $uploadedFile = $request->file('foto')->storeOnCloudinary($folder);
 
             $user = new User;
             $user->name = $request->name;
             $user->email = $request->email;
             $user->username = $request->username;
-            $user->foto = $photo;
-            $user->peran = 'Pihak Pemancingan';
-            $user->password = bcrypt($request->password);
             $user->no_hp = $request->no_hp;
+            $user->foto = $uploadedFile->getSecurePath();
+            $user->password = bcrypt($request->password);
             $user->keterangan = $request->keterangan;
+            $user->peran = 'Pemancing';
             $user->save();
-
             DB::commit();
-            \Session::flash('msg_success','Pemilik Pemancingan Berhasil Ditambah!');
+            \Session::flash('msg_success', 'Pemilik Pemancingan Berhasil Ditambah!');
             return Redirect::route('admin.dataPemilik');
 
         } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('admin.dataPemilik');
         }
     }
-    public function updatePemilik(Request $request){
+    public function updatePemilik(Request $request)
+    {
         DB::beginTransaction();
         try {
-            if (empty($request->foto)) {
-                if (empty($request->password)) {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->keterangan = $request->keterangan;
-                    $user->save();
-                }else {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->password = bcrypt($request->password);
-                    $user->no_hp = $request->no_hp;
-                    $user->keterangan = $request->keterangan;
-                    $user->save();
+            $user = User::find($request->id);
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->no_hp = $request->no_hp;
+
+            if ($request->hasFile('foto')) {
+                if ($user->foto) {
+                    $publicId = Cloudinary::privateResource($user->foto)->getPublicId();
+                    Cloudinary::destroy($publicId);
                 }
-            }else {
-                if (empty($request->password)) {
-                    $user = User::find($request->id);
 
-                    \File::delete(public_path('foto/'.$user->foto));
+                $folder = 'web_pemancingan_fahri';
 
-                    $namafoto = "Foto"."  ".$request->name." ".date("Y-m-d H-i-s");
-                    $extention = $request->file('foto')->extension();
-                    $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() .'/public/foto';
-                    $request->file('foto')->move($destination,$photo);
+                $uploadedFile = $request->file('foto')->storeOnCloudinary($folder);
 
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->foto = $photo;
-                    $user->no_hp = $request->no_hp;
-                    $user->keterangan = $request->keterangan;
-                    $user->save();
-                }else {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->foto = $photo;
-                    $user->password = bcrypt($request->password);
-                    $user->no_hp = $request->no_hp;
-                    $user->keterangan = $request->keterangan;
-                    $user->save();
-                }
+                $user->foto = $uploadedFile->getSecurePath();
             }
-             DB::commit();
-            \Session::flash('msg_success','Pemilik Pemancingan Berhasil Diubah!');
+
+            if (!empty($request->password)) {
+                $user->password = bcrypt($request->password);
+            }
+
+            $user->save();
+
+            DB::commit();
+            \Session::flash('msg_success', 'Pemilik Pemancingan Berhasil Diubah!');
             return Redirect::route('admin.dataPemilik');
 
         } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('admin.dataPemilik');
         }
     }
@@ -304,40 +246,43 @@ class AdminController extends Controller
     {
         DB::beginTransaction();
         try {
-            $getUser = User::where('id',$id)->first();
-            \File::delete(public_path('foto/'.$getUser->foto));
-            $user = User::where('id',$id)->delete();
+            $getUser = User::where('id', $id)->first();
+            Cloudinary::destroy($getUser->foto);
+            User::where('id', $id)->delete();
             DB::commit();
-            \Session::flash('msg_success','Data Pemilik Pemancingan Berhasil Dihapus!');
+            \Session::flash('msg_success', 'Data Pemilik Pemancingan Berhasil Dihapus!');
             return Redirect::route('admin.dataPemilik');
 
         } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('admin.dataPemilik');
         }
     }
 
-    public function dataPemancingan(){
+    public function dataPemancingan()
+    {
         $pemancingan = Pemancingan::all();
         $title = 'Data Pemancingan';
-        return view('admin.data_pemancingan', compact('pemancingan','title'));
+        return view('admin.data_pemancingan', compact('pemancingan', 'title'));
     }
 
-    public function setuju($id) {
+    public function setuju($id)
+    {
         $pemancingan = Pemancingan::find($id);
         $pemancingan->status = 'Disetujui';
         $pemancingan->save();
 
-        \Session::flash('msg_success','Status Pemancingan Berhasil Diubah!');
+        \Session::flash('msg_success', 'Status Pemancingan Berhasil Diubah!');
         return Redirect::route('admin.dataPemancingan');
     }
-    public function tolak($id) {
+    public function tolak($id)
+    {
         $pemancingan = Pemancingan::find($id);
         $pemancingan->status = 'Ditolak';
         $pemancingan->save();
 
-        \Session::flash('msg_success','Status Pemancingan Berhasil Diubah!');
+        \Session::flash('msg_success', 'Status Pemancingan Berhasil Diubah!');
         return Redirect::route('admin.dataPemancingan');
     }
 
@@ -345,16 +290,16 @@ class AdminController extends Controller
     {
         DB::beginTransaction();
         try {
-            $getPemancingan = Pemancingan::where('id',$id)->first();
-            \File::delete(public_path('foto/'.$getPemancingan->gambar));
-            $pemancingan = Pemancingan::where('id',$id)->delete();
+            $getPemancingan = Pemancingan::where('id', $id)->first();
+            Cloudinary::destroy($getPemancingan->gambar);
+            Pemancingan::where('id', $id)->delete();
             DB::commit();
-            \Session::flash('msg_success','Data Pemancingan Berhasil Dihapus!');
+            \Session::flash('msg_success', 'Data Pemancingan Berhasil Dihapus!');
             return Redirect::route('admin.dataPemancingan');
 
         } catch (\Exception $e) {
             DB::rollback();
-            \Session::flash('msg_error','Somethings Wrong!');
+            \Session::flash('msg_error', 'Somethings Wrong!');
             return Redirect::route('admin.dataPemancingan');
         }
     }

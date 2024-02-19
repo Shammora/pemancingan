@@ -27,66 +27,49 @@ class PemancinganController extends Controller
     public function updateProfile(Request $request)
     {
         DB::beginTransaction();
+
         try {
-            if (empty($request->foto)) {
-                if (empty($request->password)) {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->save();
-                } else {
-                    $user = User::find($request->id);
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->password = bcrypt($request->password);
-                    $user->save();
+            $user = User::find($request->id);
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->no_hp = $request->no_hp;
+
+            if ($request->hasFile('foto')) {
+                if ($user->foto) {
+                    $publicId = Cloudinary::privateResource($user->foto)->getPublicId();
+                    Cloudinary::destroy($publicId);
                 }
-            } else {
-                if (empty($request->password)) {
-                    $user = User::find($request->id);
 
-                    \File::delete(public_path('foto/' . $user->foto));
+                $folder = 'web_pemancingan_fahri';
 
-                    $namafoto = "Foto" . "  " . $request->name . " " . date("Y-m-d H-i-s");
-                    $extention = $request->file('foto')->extension();
-                    $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() . '/public/foto';
-                    $request->file('foto')->move($destination, $photo);
+                $uploadedFile = $request->file('foto')->storeOnCloudinary($folder);
 
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->foto = $photo;
-                    $user->save();
-                } else {
-                    $user = User::find($request->id);
-
-                    \File::delete(public_path('foto/' . $user->foto));
-
-                    $namafoto = "Foto" . "  " . $request->name . " " . date("Y-m-d H-i-s");
-                    $extention = $request->file('foto')->extension();
-                    $photo = sprintf('%s.%0.8s', $namafoto, $extention);
-                    $destination = base_path() . '/public/foto';
-                    $request->file('foto')->move($destination, $photo);
-
-                    $user->name = $request->name;
-                    $user->email = $request->email;
-                    $user->no_hp = $request->no_hp;
-                    $user->foto = $photo;
-                    $user->password = bcrypt($request->password);
-                    $user->save();
-                }
+                $user->foto = $uploadedFile->getSecurePath();
             }
+
+            if (!empty($request->password)) {
+                $user->password = bcrypt($request->password);
+            }
+
+            $user->save();
+
             DB::commit();
+
             \Session::flash('msg_success', 'Profile Berhasil Diubah!');
             return Redirect::route('pemancingan.profile');
-
         } catch (\Exception $e) {
             DB::rollback();
+
+            // Buat error log
+            \Log::error('Exception caught: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             \Session::flash('msg_error', 'Somethings Wrong!');
-            return Redirect::route('pemancingan.profile');
+            return Redirect::route('pemancing.profile');
         }
     }
 
@@ -178,8 +161,8 @@ class PemancinganController extends Controller
         DB::beginTransaction();
         try {
             $getPemancingan = Pemancingan::where('id', $id)->first();
-            \File::delete(public_path('foto/' . $getPemancingan->gambar));
-            // $pemancingan = Pemancingan::where('id',$id)->delete();
+            Cloudinary::destroy($getPemancingan->gambar);
+            Pemancingan::where('id', $id)->delete();
             DB::commit();
             \Session::flash('msg_success', 'Data Pemancingan Berhasil Dihapus!');
             return Redirect::route('pemancingan.dataPemancingan');
