@@ -45,6 +45,10 @@
     @endif
     <div class="row">
         <div class="col-xs-12">
+            <div class="text-right mb-10">
+                <a href="{{ route('admin.setujuSemua') }}" class="btn btn-success">Setujui Semua</a>
+                <a href="{{ route('admin.tolakSemua') }}" class="btn btn-danger">Tolak Semua</a>
+            </div>
             <div class="box box-danger">
                 <div class="box-header">
                     <h3 class="box-title">Data Pemancingan</h3>

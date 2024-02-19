@@ -109,8 +109,8 @@
 },
 @endforeach
 @php
-    $pemancinganCount = count($pemancingan);
-    @endphp
+$pemancinganCount = count($pemancingan);
+@endphp
 @endisset
 ]
     </pre>

@@ -132,7 +132,8 @@ class PemancingController extends Controller
         $dataLengkap = json_decode($dataMentah, true);
 
         // Pilah data agar yang tersimpan hanya elemen "nama" dalam array
-        $pemancinganArray = array_column($dataLengkap, 'nama');
+        // $pemancinganArray = array_column($dataLengkap, 'nama');
+        $pemancinganArray = Pemancingan::where('status', 'Disetujui')->get();
 
         // Jika data yang dicari tidak ditemukan, kembali ke halaman pemancingan
         if (empty($request->search)) {
@@ -152,12 +153,12 @@ class PemancingController extends Controller
             $prosesPencarian[] = [
                 'cari' => $request->search,
                 'tahap' => $i + 1,
-                'perbandingan' => "Bandingkan dengan index ke " . $i . " (" . $pemancinganArray[$i] . ")",
+                'perbandingan' => "Bandingkan dengan index ke " . $i . " (" . $pemancinganArray[$i]->nama . ")",
                 'ditemukan' => false,
             ];
 
             // Bandingkan data nama dalam array dengan nama di kolom pencarian
-            if (strtolower($pemancinganArray[$i]) == strtolower($request->search)) {
+            if (strtolower($pemancinganArray[$i]->nama) == strtolower($request->search)) {
 
                 // Jika data ditemukan, kembalikan id dari data tersebut dan tampilkan hasil pencarian
                 $hasilData = Pemancingan::find($dataLengkap[$i]['id']); // Isi hasildata dengan dataLengkap sesuai id dari data yang ditemukan

@@ -286,6 +286,36 @@ class AdminController extends Controller
         return Redirect::route('admin.dataPemancingan');
     }
 
+    public function setujuSemua()
+    {
+        DB::beginTransaction();
+        try {
+            Pemancingan::where('status', 'Menunggu')->update(['status' => 'Disetujui']);
+            DB::commit();
+            \Session::flash('msg_success', 'Semua Data Pemancingan Berhasil Disetujui!');
+            return Redirect::route('admin.dataPemancingan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Session::flash('msg_error', 'Terjadi Kesalahan!');
+            return Redirect::route('admin.dataPemancingan');
+        }
+    }
+
+    public function tolakSemua()
+    {
+        DB::beginTransaction();
+        try {
+            Pemancingan::where('status', 'Menunggu')->update(['status' => 'Ditolak']);
+            DB::commit();
+            \Session::flash('msg_success', 'Semua Data Pemancingan Berhasil Ditolak!');
+            return Redirect::route('admin.dataPemancingan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Session::flash('msg_error', 'Terjadi Kesalahan!');
+            return Redirect::route('admin.dataPemancingan');
+        }
+    }
+
     public function deletePemancingan($id)
     {
         DB::beginTransaction();

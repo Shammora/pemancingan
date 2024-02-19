@@ -43,6 +43,8 @@ Route::middleware(['auth'])->group(function () {
         Route::any('/setuju/{id}', [AdminController::class, 'setuju'])->name('admin.setuju');
         Route::any('/tolak/{id}', [AdminController::class, 'tolak'])->name('admin.tolak');
         Route::any('/delete_pemancingan/{id}', [AdminController::class, 'deletePemancingan'])->name('admin.deletePemancingan');
+        Route::any('/setuju_semua', [AdminController::class, 'setujuSemua'])->name('admin.setujuSemua');
+        Route::any('/tolak_semua', [AdminController::class, 'tolakSemua'])->name('admin.tolakSemua');
     });
 });
 
