@@ -203,6 +203,47 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-4">
+                                <p class="text-dark"><b>Link Map</b></p>
+                            </div>
+                            <div class="col-sm-8">
+                                @if(isset($detail->link_map))
+                                @php
+                                if(isset($detail->link_map)){
+
+                                $pattern = '/src="([^"]+)"/';
+                                preg_match($pattern, $detail->link_map, $matches);
+                                $src = isset($matches[1]) ? $matches[1] : null;
+
+                                $array = explode('=', $src);
+
+                                $data = array_filter(explode('!', $array[1]));
+
+                                $location = $x = $y = '';
+                                foreach ($data as $s) {
+                                if (substr($s, 0, 2) == "2s" && strlen($s) > 5) {
+                                $location = substr($s, 2);
+                                } elseif (substr($s, 0, 2) == "3d" && strlen($s) > 5) {
+                                $x = substr($s, 2);
+                                } elseif (substr($s, 0, 2) == "2d" && strlen($s) > 5) {
+                                $y = substr($s, 2);
+                                }
+                                }
+
+                                if ($location != "" && $x != "" && $y != "") {
+                                $result = 'https://www.google.com/maps/place/' . str_replace(' ', '',
+                                urldecode($location)) . '/@' . $x . ','
+                                . $y;
+                                }
+                                }
+                                @endphp
+                                : <a href="{{$result}}">{{$result}}</a>
+                                @else
+                                <p class="text-dark">: Belum ada link</a></p>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
                                 <p class="text-dark"><b>Google Map</b></p>
                             </div>
                             <div class="col-sm-8">
