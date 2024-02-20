@@ -99,19 +99,24 @@
                         <div id="dataMentah" class="mt-4" style="display: none; margin-top: 10px;">
                             <pre>
 [
-@isset($pemancingan)
+@php
+    $pemancinganExists = isset($pemancingan);
+@endphp
+
+@if($pemancinganExists)
 @foreach($pemancingan as $key => $value)
 {
     "id": "{{ $value->id }}",
     "nama": "{{ $value->nama }}",
-    "gambar": "{{$value->gambar }}",
+    "gambar": "{{ $value->gambar }}",
     "deskripsi": "{{ $value->deskripsi }}"
-},
+}{{ !$loop->last ? ',' : '' }}
 @endforeach
 @php
 $pemancinganCount = count($pemancingan);
 @endphp
-@endisset
+@endif
+
 ]
     </pre>
                         </div>

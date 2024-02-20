@@ -62,6 +62,7 @@
                                 <th>Nama</th>
                                 <th>Deskripsi</th>
                                 <th>Alamat</th>
+                                <th>Embed Map</th>
                                 <th>Link Map</th>
                                 <th>No Telpon</th>
                                 <th>Fasilitas</th>
@@ -79,7 +80,10 @@
                                 <td>{{ @$value->nama }}</td>
                                 <td>{{ @$value->deskripsi }}</td>
                                 <td>{{ @$value->alamat }}</td>
-                                <td>{{ @$value->link_map }}</td>
+                                <td>
+                                    <div>{!! @$value->link_map !!}</div>
+                                </td>
+                                <td>{{ @$value->link_map_2 }}</td>
                                 <td>{{ @$value->telpon }}</td>
                                 <td>{{ @$value->fasilitas }}</td>
                                 <td>{{ @$value->umpan }}</td>
@@ -120,7 +124,6 @@
 
     $('#data-pemancing').on('click', '.btn-edit-pemancing', function () {
         row = table.row($(this).closest('tr')).data();
-        console.log(row);
         $('input[name=id]').val(row[0]);
         $('input[name=name]').val(row[2]);
         $('input[name=email]').val(row[3]);
